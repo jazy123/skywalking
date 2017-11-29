@@ -1,0 +1,16 @@
+org.skywalking.apm.collector.storage.sjdbc.define.ApplicationShardingjdbcTableDefine
+org.skywalking.apm.collector.storage.sjdbc.define.InstanceShardingjdbcTableDefine
+org.skywalking.apm.collector.storage.sjdbc.define.ServiceNameShardingjdbcTableDefine
+org.skywalking.apm.collector.storage.sjdbc.define.CpuMetricShardingjdbcTableDefine
+org.skywalking.apm.collector.storage.sjdbc.define.GCMetricShardingjdbcTableDefine
+org.skywalking.apm.collector.storage.sjdbc.define.MemoryMetricShardingjdbcTableDefine
+org.skywalking.apm.collector.storage.sjdbc.define.MemoryPoolMetricShardingjdbcTableDefine
+org.skywalking.apm.collector.storage.sjdbc.define.GlobalTraceShardingjdbcTableDefine
+org.skywalking.apm.collector.storage.sjdbc.define.InstPerformanceShardingjdbcTableDefine
+org.skywalking.apm.collector.storage.sjdbc.define.NodeComponentShardingjdbcTableDefine
+org.skywalking.apm.collector.storage.sjdbc.define.NodeMappingShardingjdbcTableDefine
+org.skywalking.apm.collector.storage.sjdbc.define.NodeReferenceShardingjdbcTableDefine
+org.skywalking.apm.collector.storage.sjdbc.define.SegmentCostShardingjdbcTableDefine
+org.skywalking.apm.collector.storage.sjdbc.define.SegmentShardingjdbcTableDefine
+org.skywalking.apm.collector.storage.sjdbc.define.ServiceEntryShardingjdbcTableDefine
+org.skywalking.apm.collector.storage.sjdbc.define.ServiceReferenceShardingjdbcTableDefine

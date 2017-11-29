@@ -30,10 +30,14 @@ ui:
     host: localhost
     port: 12800
     context_path: /
-#storage:
+storage:
 #  elasticsearch:
 #    cluster_name: CollectorDBCluster
 #    cluster_transport_sniffer: true
 #    cluster_nodes: localhost:9300
 #    index_shards_number: 2
 #    index_replicas_number: 0
+#  shardingjdbc:
+#    url: jdbc:mysql://localhost:3306/collector
+#    user_name: coll
+#    password: coll1027
