@@ -56,7 +56,7 @@ public class InstanceShardingjdbcUIDAO extends ShardingjdbcDAO implements IInsta
 
     @Override
     public Long lastHeartBeatTime() {
-    	ShardingjdbcClient client = getClient();
+        ShardingjdbcClient client = getClient();
         long fiveMinuteBefore = System.currentTimeMillis() - 5 * 60 * 1000;
         fiveMinuteBefore = TimeBucketUtils.INSTANCE.getSecondTimeBucket(fiveMinuteBefore);
         String sql = SqlBuilder.buildSql(GET_LAST_HEARTBEAT_TIME_SQL, InstanceTable.COLUMN_HEARTBEAT_TIME, InstanceTable.TABLE, InstanceTable.COLUMN_HEARTBEAT_TIME);
@@ -73,7 +73,7 @@ public class InstanceShardingjdbcUIDAO extends ShardingjdbcDAO implements IInsta
 
     @Override
     public Long instanceLastHeartBeatTime(long applicationInstanceId) {
-    	ShardingjdbcClient client = getClient();
+        ShardingjdbcClient client = getClient();
         long fiveMinuteBefore = System.currentTimeMillis() - 5 * 60 * 1000;
         fiveMinuteBefore = TimeBucketUtils.INSTANCE.getSecondTimeBucket(fiveMinuteBefore);
         String sql = SqlBuilder.buildSql(GET_INST_LAST_HEARTBEAT_TIME_SQL, InstanceTable.COLUMN_HEARTBEAT_TIME, InstanceTable.TABLE,
@@ -91,7 +91,7 @@ public class InstanceShardingjdbcUIDAO extends ShardingjdbcDAO implements IInsta
 
     @Override
     public JsonArray getApplications(long startTime, long endTime) {
-    	ShardingjdbcClient client = getClient();
+        ShardingjdbcClient client = getClient();
         JsonArray applications = new JsonArray();
         String sql = SqlBuilder.buildSql(GET_APPLICATIONS_SQL, InstanceTable.COLUMN_INSTANCE_ID,
             InstanceTable.TABLE, InstanceTable.COLUMN_HEARTBEAT_TIME, InstanceTable.COLUMN_APPLICATION_ID);
@@ -113,7 +113,7 @@ public class InstanceShardingjdbcUIDAO extends ShardingjdbcDAO implements IInsta
 
     @Override
     public Instance getInstance(int instanceId) {
-    	ShardingjdbcClient client = getClient();
+        ShardingjdbcClient client = getClient();
         String sql = SqlBuilder.buildSql(GET_INSTANCE_SQL, InstanceTable.TABLE, InstanceTable.COLUMN_INSTANCE_ID);
         Object[] params = new Object[] {instanceId};
         try (ResultSet rs = client.executeQuery(sql, params)) {

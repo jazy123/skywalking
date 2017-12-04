@@ -53,7 +53,7 @@ public class ApplicationShardingjdbcRegisterDAO extends ShardingjdbcDAO implemen
 
     @Override
     public void save(Application application) {
-    	ShardingjdbcClient client = getClient();
+        ShardingjdbcClient client = getClient();
 
         Map<String, Object> source = new HashMap<>();
         source.put(ApplicationTable.COLUMN_ID, application.getId());

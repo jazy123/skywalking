@@ -18,15 +18,11 @@
 
 package org.skywalking.apm.collector.client.sjdbc;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import org.skywalking.apm.collector.client.Client;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.sql.*;
 
 /**
  * @author linjiaqi
@@ -46,22 +42,24 @@ public class ShardingjdbcClient implements Client {
         this.password = password;
     }
 
-    @Override public void initialize() throws ShardingjdbcClientException {
+    @Override
+    public void initialize() throws ShardingjdbcClientException {
         try {
             Class.forName("com.mysql.jdbc.Driver");
             conn = DriverManager.
-                getConnection(this.url, this.userName, this.password);
+                    getConnection(this.url, this.userName, this.password);
         } catch (Exception e) {
             throw new ShardingjdbcClientException(e.getMessage(), e);
         }
     }
 
-    @Override public void shutdown() {
-    	try {
-			conn.close();
-		} catch (SQLException e) {
-			logger.error(e.getMessage(), e);
-		}
+    @Override
+    public void shutdown() {
+        try {
+            conn.close();
+        } catch (SQLException e) {
+            logger.error(e.getMessage(), e);
+        }
     }
 
     public Connection getConnection() throws ShardingjdbcClientException {

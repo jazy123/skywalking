@@ -63,7 +63,7 @@ public class CpuMetricShardingjdbcUIDAO extends ShardingjdbcDAO implements ICpuM
     }
 
     @Override public JsonArray getMetric(int instanceId, long startTimeBucket, long endTimeBucket) {
-    	ShardingjdbcClient client = getClient();
+        ShardingjdbcClient client = getClient();
         String sql = SqlBuilder.buildSql(GET_CPU_METRIC_SQL, CpuMetricTable.TABLE, CpuMetricTable.COLUMN_ID);
 
         long timeBucket = startTimeBucket;

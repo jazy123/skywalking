@@ -49,7 +49,7 @@ public abstract class ShardingjdbcDAO extends AbstractDAO<ShardingjdbcClient> {
     }
 
     private int getIntValueBySQL(String sql) {
-    	ShardingjdbcClient client = getClient();
+        ShardingjdbcClient client = getClient();
         try (ResultSet rs = client.executeQuery(sql, null)) {
             if (rs.next()) {
                 int id = rs.getInt(1);

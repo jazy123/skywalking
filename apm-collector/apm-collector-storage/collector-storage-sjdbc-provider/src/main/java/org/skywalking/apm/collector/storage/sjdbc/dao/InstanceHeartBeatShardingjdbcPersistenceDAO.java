@@ -51,7 +51,7 @@ public class InstanceHeartBeatShardingjdbcPersistenceDAO extends ShardingjdbcDAO
     private static final String GET_INSTANCE_HEARTBEAT_SQL = "select * from {0} where {1} = ?";
 
     @Override public Instance get(String id) {
-    	ShardingjdbcClient client = getClient();
+        ShardingjdbcClient client = getClient();
         String sql = SqlBuilder.buildSql(GET_INSTANCE_HEARTBEAT_SQL, InstanceTable.TABLE, InstanceTable.COLUMN_INSTANCE_ID);
         Object[] params = new Object[] {id};
         try (ResultSet rs = client.executeQuery(sql, params)) {

@@ -49,7 +49,7 @@ public class InstPerformanceShardingjdbcPersistenceDAO extends ShardingjdbcDAO i
     }
 
     @Override public InstPerformance get(String id) {
-    	ShardingjdbcClient client = getClient();
+        ShardingjdbcClient client = getClient();
         String sql = SqlBuilder.buildSql(GET_SQL, InstPerformanceTable.TABLE, InstPerformanceTable.COLUMN_ID);
         Object[] params = new Object[] {id};
         try (ResultSet rs = client.executeQuery(sql, params)) {
