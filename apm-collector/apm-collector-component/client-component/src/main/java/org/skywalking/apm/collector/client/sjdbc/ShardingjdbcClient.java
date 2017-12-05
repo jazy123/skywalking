@@ -18,36 +18,72 @@
 
 package org.skywalking.apm.collector.client.sjdbc;
 
+import io.shardingjdbc.core.api.ShardingDataSourceFactory;
+import io.shardingjdbc.core.api.config.ShardingRuleConfiguration;
+import io.shardingjdbc.core.api.config.TableRuleConfiguration;
+import io.shardingjdbc.core.api.config.strategy.InlineShardingStrategyConfiguration;
 import org.skywalking.apm.collector.client.Client;
+import org.apache.commons.dbcp.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.sql.DataSource;
 import java.sql.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 /**
- * @author linjiaqi
+ * @author linjiaqi,wangkai
  */
 public class ShardingjdbcClient implements Client {
 
     private final Logger logger = LoggerFactory.getLogger(ShardingjdbcClient.class);
 
-    private Connection conn;
     private String url;
     private String userName;
     private String password;
+    private int shardingCount;
+    private DataSource dataSource;
 
-    public ShardingjdbcClient(String url, String userName, String password) {
+    private static TableRuleConfiguration getOrderTableRuleConfiguration() {
+        TableRuleConfiguration orderTableRuleConfig = new TableRuleConfiguration();
+        orderTableRuleConfig.setLogicTable("t_order");
+        orderTableRuleConfig.setKeyGeneratorColumnName("order_id");
+        return orderTableRuleConfig;
+    }
+
+    private static TableRuleConfiguration getOrderItemTableRuleConfiguration() {
+        TableRuleConfiguration orderItemTableRuleConfig = new TableRuleConfiguration();
+        orderItemTableRuleConfig.setLogicTable("t_order_item");
+        return orderItemTableRuleConfig;
+    }
+
+
+    public ShardingjdbcClient(String url, String userName, String password, int shardingCount) {
         this.url = url;
         this.userName = userName;
         this.password = password;
+        this.shardingCount = shardingCount;
     }
 
     @Override
     public void initialize() throws ShardingjdbcClientException {
         try {
-            Class.forName("com.mysql.jdbc.Driver");
-            conn = DriverManager.
-                    getConnection(this.url, this.userName, this.password);
+            Map<String, DataSource> result = new HashMap<>(shardingCount, 1);
+            for(int i=0;i<shardingCount;i++) {
+                BasicDataSource dataSource0 = new BasicDataSource();
+                dataSource0.setDriverClassName(com.mysql.jdbc.Driver.class.getName());
+                dataSource0.setUrl(url);
+                dataSource0.setUsername(userName);
+                dataSource0.setPassword(password);
+                result.put("skywalking_ds_"+i, dataSource);
+            }
+            ShardingRuleConfiguration shardingRuleConfig = new ShardingRuleConfiguration();
+            shardingRuleConfig.getTableRuleConfigs().add(getOrderTableRuleConfiguration());
+            shardingRuleConfig.getTableRuleConfigs().add(getOrderItemTableRuleConfiguration());
+            shardingRuleConfig.setDefaultDatabaseShardingStrategyConfig(new InlineShardingStrategyConfiguration("user_id", "demo_ds_${user_id % 2}"));
+            dataSource = ShardingDataSourceFactory.createDataSource(result, shardingRuleConfig, new HashMap<String, Object>(), new Properties());
         } catch (Exception e) {
             throw new ShardingjdbcClientException(e.getMessage(), e);
         }
@@ -56,14 +92,18 @@ public class ShardingjdbcClient implements Client {
     @Override
     public void shutdown() {
         try {
-            conn.close();
+            dataSource.getConnection().close();
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
         }
     }
 
     public Connection getConnection() throws ShardingjdbcClientException {
-        return conn;
+        try {
+            return dataSource.getConnection();
+        } catch (SQLException e) {
+            throw new ShardingjdbcClientException(e.getMessage());
+        }
     }
 
     public void execute(String sql) throws ShardingjdbcClientException {
