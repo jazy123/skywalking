@@ -74,7 +74,7 @@ public class ShardingjdbcClient implements Client {
             for (int i = 0; i < shardingCount; i++) {
                 BasicDataSource dataSource0 = new BasicDataSource();
                 dataSource0.setDriverClassName(com.mysql.jdbc.Driver.class.getName());
-                dataSource0.setUrl(url);
+                dataSource0.setUrl(url + i);
                 dataSource0.setUsername(userName);
                 dataSource0.setPassword(password);
                 result.put("skywalking_ds_" + i, dataSource);
