@@ -125,7 +125,7 @@ public class StorageModuleShardingjdbcProvider extends ModuleProvider {
         String url = config.getProperty(URL);
         String userName = config.getProperty(USER_NAME);
         String password = config.getProperty(PASSWORD);
-        shardingjdbcClient = new ShardingjdbcClient(url, userName, password);
+        shardingjdbcClient = new ShardingjdbcClient(url, userName, password, 2);
 
         this.registerServiceImplementation(IBatchDAO.class, new BatchShardingjdbcDAO(shardingjdbcClient));
         registerCacheDAO();
