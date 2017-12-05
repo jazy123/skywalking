@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * @author linjiaqi,wangkai
+ * @author linjiaqi, wangkai
  */
 public class ShardingjdbcClient implements Client {
 
@@ -71,13 +71,13 @@ public class ShardingjdbcClient implements Client {
     public void initialize() throws ShardingjdbcClientException {
         try {
             Map<String, DataSource> result = new HashMap<>(shardingCount, 1);
-            for(int i=0;i<shardingCount;i++) {
+            for (int i = 0; i < shardingCount; i++) {
                 BasicDataSource dataSource0 = new BasicDataSource();
                 dataSource0.setDriverClassName(com.mysql.jdbc.Driver.class.getName());
                 dataSource0.setUrl(url);
                 dataSource0.setUsername(userName);
                 dataSource0.setPassword(password);
-                result.put("skywalking_ds_"+i, dataSource);
+                result.put("skywalking_ds_" + i, dataSource);
             }
             ShardingRuleConfiguration shardingRuleConfig = new ShardingRuleConfiguration();
             shardingRuleConfig.getTableRuleConfigs().add(getOrderTableRuleConfiguration());
