@@ -22,8 +22,8 @@ import io.shardingjdbc.core.api.ShardingDataSourceFactory;
 import io.shardingjdbc.core.api.config.ShardingRuleConfiguration;
 import io.shardingjdbc.core.api.config.TableRuleConfiguration;
 import io.shardingjdbc.core.api.config.strategy.InlineShardingStrategyConfiguration;
-import org.skywalking.apm.collector.client.Client;
 import org.apache.commons.dbcp.BasicDataSource;
+import org.skywalking.apm.collector.client.Client;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +40,8 @@ import java.util.Properties;
 public class ShardingjdbcClient implements Client {
 
     private final Logger logger = LoggerFactory.getLogger(ShardingjdbcClient.class);
+
+    private final static String SHARDING_DS_PREFIX = "skywalking_ds_";
 
     private List<ShardingNode> nodes;
     private DataSource dataSource;
@@ -72,7 +74,7 @@ public class ShardingjdbcClient implements Client {
                 dataSource0.setUrl(nodes.get(i).getUrl() + i);
                 dataSource0.setUsername(nodes.get(i).getUsername());
                 dataSource0.setPassword(nodes.get(i).getPassword());
-                result.put("skywalking_ds_" + i, dataSource);
+                result.put(SHARDING_DS_PREFIX + i, dataSource);
             }
             ShardingRuleConfiguration shardingRuleConfig = new ShardingRuleConfiguration();
             shardingRuleConfig.getTableRuleConfigs().add(getOrderTableRuleConfiguration());
