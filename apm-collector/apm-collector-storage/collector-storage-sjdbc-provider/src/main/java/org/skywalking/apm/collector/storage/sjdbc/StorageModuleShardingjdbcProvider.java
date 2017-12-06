@@ -17,8 +17,7 @@
  */
 package org.skywalking.apm.collector.storage.sjdbc;
 
-import java.util.Properties;
-
+import org.skywalking.apm.collector.client.sjdbc.ShardingNode;
 import org.skywalking.apm.collector.client.sjdbc.ShardingjdbcClient;
 import org.skywalking.apm.collector.client.sjdbc.ShardingjdbcClientException;
 import org.skywalking.apm.collector.core.module.Module;
@@ -27,106 +26,56 @@ import org.skywalking.apm.collector.core.module.ServiceNotProvidedException;
 import org.skywalking.apm.collector.storage.StorageException;
 import org.skywalking.apm.collector.storage.StorageModule;
 import org.skywalking.apm.collector.storage.base.dao.IBatchDAO;
-import org.skywalking.apm.collector.storage.dao.IApplicationCacheDAO;
-import org.skywalking.apm.collector.storage.dao.IApplicationRegisterDAO;
-import org.skywalking.apm.collector.storage.dao.ICpuMetricPersistenceDAO;
-import org.skywalking.apm.collector.storage.dao.ICpuMetricUIDAO;
-import org.skywalking.apm.collector.storage.dao.IGCMetricPersistenceDAO;
-import org.skywalking.apm.collector.storage.dao.IGCMetricUIDAO;
-import org.skywalking.apm.collector.storage.dao.IGlobalTracePersistenceDAO;
-import org.skywalking.apm.collector.storage.dao.IGlobalTraceUIDAO;
-import org.skywalking.apm.collector.storage.dao.IInstPerformancePersistenceDAO;
-import org.skywalking.apm.collector.storage.dao.IInstPerformanceUIDAO;
-import org.skywalking.apm.collector.storage.dao.IInstanceCacheDAO;
-import org.skywalking.apm.collector.storage.dao.IInstanceHeartBeatPersistenceDAO;
-import org.skywalking.apm.collector.storage.dao.IInstanceRegisterDAO;
-import org.skywalking.apm.collector.storage.dao.IInstanceUIDAO;
-import org.skywalking.apm.collector.storage.dao.IMemoryMetricPersistenceDAO;
-import org.skywalking.apm.collector.storage.dao.IMemoryMetricUIDAO;
-import org.skywalking.apm.collector.storage.dao.IMemoryPoolMetricPersistenceDAO;
-import org.skywalking.apm.collector.storage.dao.IMemoryPoolMetricUIDAO;
-import org.skywalking.apm.collector.storage.dao.INodeComponentPersistenceDAO;
-import org.skywalking.apm.collector.storage.dao.INodeComponentUIDAO;
-import org.skywalking.apm.collector.storage.dao.INodeMappingPersistenceDAO;
-import org.skywalking.apm.collector.storage.dao.INodeMappingUIDAO;
-import org.skywalking.apm.collector.storage.dao.INodeReferencePersistenceDAO;
-import org.skywalking.apm.collector.storage.dao.INodeReferenceUIDAO;
-import org.skywalking.apm.collector.storage.dao.ISegmentCostPersistenceDAO;
-import org.skywalking.apm.collector.storage.dao.ISegmentCostUIDAO;
-import org.skywalking.apm.collector.storage.dao.ISegmentPersistenceDAO;
-import org.skywalking.apm.collector.storage.dao.ISegmentUIDAO;
-import org.skywalking.apm.collector.storage.dao.IServiceEntryPersistenceDAO;
-import org.skywalking.apm.collector.storage.dao.IServiceEntryUIDAO;
-import org.skywalking.apm.collector.storage.dao.IServiceNameCacheDAO;
-import org.skywalking.apm.collector.storage.dao.IServiceNameRegisterDAO;
-import org.skywalking.apm.collector.storage.dao.IServiceReferencePersistenceDAO;
-import org.skywalking.apm.collector.storage.dao.IServiceReferenceUIDAO;
+import org.skywalking.apm.collector.storage.dao.*;
 import org.skywalking.apm.collector.storage.sjdbc.base.dao.BatchShardingjdbcDAO;
 import org.skywalking.apm.collector.storage.sjdbc.base.define.ShardingjdbcStorageInstaller;
-import org.skywalking.apm.collector.storage.sjdbc.dao.ApplicationShardingjdbcCacheDAO;
-import org.skywalking.apm.collector.storage.sjdbc.dao.ApplicationShardingjdbcRegisterDAO;
-import org.skywalking.apm.collector.storage.sjdbc.dao.CpuMetricShardingjdbcPersistenceDAO;
-import org.skywalking.apm.collector.storage.sjdbc.dao.CpuMetricShardingjdbcUIDAO;
-import org.skywalking.apm.collector.storage.sjdbc.dao.GCMetricShardingjdbcPersistenceDAO;
-import org.skywalking.apm.collector.storage.sjdbc.dao.GCMetricShardingjdbcUIDAO;
-import org.skywalking.apm.collector.storage.sjdbc.dao.GlobalTraceShardingjdbcPersistenceDAO;
-import org.skywalking.apm.collector.storage.sjdbc.dao.GlobalTraceShardingjdbcUIDAO;
-import org.skywalking.apm.collector.storage.sjdbc.dao.InstPerformanceShardingjdbcPersistenceDAO;
-import org.skywalking.apm.collector.storage.sjdbc.dao.InstPerformanceShardingjdbcUIDAO;
-import org.skywalking.apm.collector.storage.sjdbc.dao.InstanceHeartBeatShardingjdbcPersistenceDAO;
-import org.skywalking.apm.collector.storage.sjdbc.dao.InstanceShardingjdbcCacheDAO;
-import org.skywalking.apm.collector.storage.sjdbc.dao.InstanceShardingjdbcRegisterDAO;
-import org.skywalking.apm.collector.storage.sjdbc.dao.InstanceShardingjdbcUIDAO;
-import org.skywalking.apm.collector.storage.sjdbc.dao.MemoryMetricShardingjdbcPersistenceDAO;
-import org.skywalking.apm.collector.storage.sjdbc.dao.MemoryMetricShardingjdbcUIDAO;
-import org.skywalking.apm.collector.storage.sjdbc.dao.MemoryPoolMetricShardingjdbcPersistenceDAO;
-import org.skywalking.apm.collector.storage.sjdbc.dao.MemoryPoolMetricShardingjdbcUIDAO;
-import org.skywalking.apm.collector.storage.sjdbc.dao.NodeComponentShardingjdbcPersistenceDAO;
-import org.skywalking.apm.collector.storage.sjdbc.dao.NodeComponentShardingjdbcUIDAO;
-import org.skywalking.apm.collector.storage.sjdbc.dao.NodeMappingShardingjdbcPersistenceDAO;
-import org.skywalking.apm.collector.storage.sjdbc.dao.NodeMappingShardingjdbcUIDAO;
-import org.skywalking.apm.collector.storage.sjdbc.dao.NodeReferenceShardingjdbcPersistenceDAO;
-import org.skywalking.apm.collector.storage.sjdbc.dao.NodeReferenceShardingjdbcUIDAO;
-import org.skywalking.apm.collector.storage.sjdbc.dao.SegmentCostShardingjdbcPersistenceDAO;
-import org.skywalking.apm.collector.storage.sjdbc.dao.SegmentCostShardingjdbcUIDAO;
-import org.skywalking.apm.collector.storage.sjdbc.dao.SegmentShardingjdbcPersistenceDAO;
-import org.skywalking.apm.collector.storage.sjdbc.dao.SegmentShardingjdbcUIDAO;
-import org.skywalking.apm.collector.storage.sjdbc.dao.ServiceEntryShardingjdbcPersistenceDAO;
-import org.skywalking.apm.collector.storage.sjdbc.dao.ServiceEntryShardingjdbcUIDAO;
-import org.skywalking.apm.collector.storage.sjdbc.dao.ServiceNameShardingjdbcCacheDAO;
-import org.skywalking.apm.collector.storage.sjdbc.dao.ServiceNameShardingjdbcRegisterDAO;
-import org.skywalking.apm.collector.storage.sjdbc.dao.ServiceReferenceShardingjdbcPersistenceDAO;
-import org.skywalking.apm.collector.storage.sjdbc.dao.ServiceReferenceShardingjdbcUIDAO;
+import org.skywalking.apm.collector.storage.sjdbc.dao.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
 /**
- * @author linjiaqi
+ * @author wangkai
  */
 public class StorageModuleShardingjdbcProvider extends ModuleProvider {
 
     private final Logger logger = LoggerFactory.getLogger(StorageModuleShardingjdbcProvider.class);
 
     private static final String URL = "url";
-    private static final String USER_NAME = "user_name";
+    private static final String USER_NAME = "username";
     private static final String PASSWORD = "password";
 
     private ShardingjdbcClient shardingjdbcClient;
 
-    @Override public String name() {
+    @Override
+    public String name() {
         return "shardingjdbc";
     }
 
-    @Override public Class<? extends Module> module() {
+    @Override
+    public Class<? extends Module> module() {
         return StorageModule.class;
     }
 
-    @Override public void prepare(Properties config) throws ServiceNotProvidedException {
-        String url = config.getProperty(URL);
-        String userName = config.getProperty(USER_NAME);
-        String password = config.getProperty(PASSWORD);
-        shardingjdbcClient = new ShardingjdbcClient(url, userName, password, 2);
-
+    @Override
+    public void prepare(Properties config) throws ServiceNotProvidedException {
+        List<ShardingNode> nodes = new ArrayList<>();
+        int index = 0;
+        while (true) {
+            String url = config.getProperty(URL + "_" + index);
+            String username = config.getProperty(USER_NAME + "_" + index);
+            String password = config.getProperty(PASSWORD + "_" + index);
+            if (url != null && username != null && password != null) {
+                nodes.add(new ShardingNode(url, username, password));
+                index++;
+            } else {
+                break;
+            }
+        }
+        shardingjdbcClient = new ShardingjdbcClient(nodes);
         this.registerServiceImplementation(IBatchDAO.class, new BatchShardingjdbcDAO(shardingjdbcClient));
         registerCacheDAO();
         registerRegisterDAO();
@@ -134,7 +83,8 @@ public class StorageModuleShardingjdbcProvider extends ModuleProvider {
         registerUiDAO();
     }
 
-    @Override public void start(Properties config) throws ServiceNotProvidedException {
+    @Override
+    public void start(Properties config) throws ServiceNotProvidedException {
         try {
             shardingjdbcClient.initialize();
 
@@ -145,11 +95,13 @@ public class StorageModuleShardingjdbcProvider extends ModuleProvider {
         }
     }
 
-    @Override public void notifyAfterCompleted() throws ServiceNotProvidedException {
+    @Override
+    public void notifyAfterCompleted() throws ServiceNotProvidedException {
 
     }
 
-    @Override public String[] requiredModules() {
+    @Override
+    public String[] requiredModules() {
         return new String[0];
     }
 

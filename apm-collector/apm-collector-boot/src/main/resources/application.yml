@@ -37,7 +37,16 @@ storage:
 #    cluster_nodes: localhost:9300
 #    index_shards_number: 2
 #    index_replicas_number: 0
-#  shardingjdbc:
-#    url: jdbc:mysql://localhost:3306/collector
-#    user_name: coll
-#    password: coll1027
+shardingjdbc:
+  url_0: jdbc:mysql://10.7.8.174:13306/collector
+  username_0: admin
+  password_0: 123456
+  url_1: jdbc:mysql://10.7.8.175:13306/collector
+  username_1: admin
+  password_1: 123456
+  url_2: jdbc:mysql://10.4.14.131:13306/collector
+  username_2: admin
+  password_2: 123456
+  url_3: jdbc:mysql://10.4.14.132:13306/collector
+  username_3: admin
+  password_3: 123456

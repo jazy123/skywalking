@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -40,10 +41,7 @@ public class ShardingjdbcClient implements Client {
 
     private final Logger logger = LoggerFactory.getLogger(ShardingjdbcClient.class);
 
-    private String url;
-    private String userName;
-    private String password;
-    private int shardingCount;
+    private List<ShardingNode> nodes;
     private DataSource dataSource;
 
     private static TableRuleConfiguration getOrderTableRuleConfiguration() {
@@ -60,23 +58,20 @@ public class ShardingjdbcClient implements Client {
     }
 
 
-    public ShardingjdbcClient(String url, String userName, String password, int shardingCount) {
-        this.url = url;
-        this.userName = userName;
-        this.password = password;
-        this.shardingCount = shardingCount;
+    public ShardingjdbcClient(List<ShardingNode> nodes) {
+        this.nodes = nodes;
     }
 
     @Override
     public void initialize() throws ShardingjdbcClientException {
         try {
-            Map<String, DataSource> result = new HashMap<>(shardingCount, 1);
-            for (int i = 0; i < shardingCount; i++) {
+            Map<String, DataSource> result = new HashMap<>(nodes.size(), 1);
+            for (int i = 0; i < nodes.size(); i++) {
                 BasicDataSource dataSource0 = new BasicDataSource();
                 dataSource0.setDriverClassName(com.mysql.jdbc.Driver.class.getName());
-                dataSource0.setUrl(url + i);
-                dataSource0.setUsername(userName);
-                dataSource0.setPassword(password);
+                dataSource0.setUrl(nodes.get(i).getUrl() + i);
+                dataSource0.setUsername(nodes.get(i).getUsername());
+                dataSource0.setPassword(nodes.get(i).getPassword());
                 result.put("skywalking_ds_" + i, dataSource);
             }
             ShardingRuleConfiguration shardingRuleConfig = new ShardingRuleConfiguration();
