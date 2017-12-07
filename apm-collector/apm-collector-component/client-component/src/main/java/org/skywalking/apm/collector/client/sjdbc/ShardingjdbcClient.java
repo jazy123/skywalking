@@ -18,21 +18,24 @@
 
 package org.skywalking.apm.collector.client.sjdbc;
 
-import io.shardingjdbc.core.api.ShardingDataSourceFactory;
-import io.shardingjdbc.core.api.config.ShardingRuleConfiguration;
-import io.shardingjdbc.core.api.config.TableRuleConfiguration;
-import io.shardingjdbc.core.api.config.strategy.InlineShardingStrategyConfiguration;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
+import javax.sql.DataSource;
+
 import org.apache.commons.dbcp.BasicDataSource;
 import org.skywalking.apm.collector.client.Client;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.sql.DataSource;
-import java.sql.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import io.shardingjdbc.core.api.ShardingDataSourceFactory;
+import io.shardingjdbc.core.api.config.ShardingRuleConfiguration;
 
 /**
  * @author linjiaqi, wangkai
@@ -41,51 +44,36 @@ public class ShardingjdbcClient implements Client {
 
     private final Logger logger = LoggerFactory.getLogger(ShardingjdbcClient.class);
 
-    private final static String SHARDING_DS_PREFIX = "skywalking_ds_";
-
-    private List<ShardingNode> nodes;
+    private Map<String, ShardingNode> shardingNodes;
+    
+    private ShardingRuleConfiguration shardingRuleConfig;
+    
+    private Map<String, DataSource> shardingDataSource = new HashMap<String, DataSource>();
+    
     private DataSource dataSource;
 
-    private static TableRuleConfiguration getOrderTableRuleConfiguration() {
-        TableRuleConfiguration orderTableRuleConfig = new TableRuleConfiguration();
-        orderTableRuleConfig.setLogicTable("t_order");
-        orderTableRuleConfig.setKeyGeneratorColumnName("order_id");
-        return orderTableRuleConfig;
-    }
-
-    private static TableRuleConfiguration getOrderItemTableRuleConfiguration() {
-        TableRuleConfiguration orderItemTableRuleConfig = new TableRuleConfiguration();
-        orderItemTableRuleConfig.setLogicTable("t_order_item");
-        return orderItemTableRuleConfig;
-    }
-
-
-    public ShardingjdbcClient(List<ShardingNode> nodes) {
-        this.nodes = nodes;
+    public ShardingjdbcClient(Map<String, ShardingNode> shardingNodes, ShardingRuleConfiguration shardingRuleConfig) {
+        this.shardingNodes = shardingNodes;
+        this.shardingRuleConfig = shardingRuleConfig;
     }
 
     @Override
     public void initialize() throws ShardingjdbcClientException {
         try {
-            Map<String, DataSource> result = new HashMap<>(nodes.size(), 1);
-            for (int i = 0; i < nodes.size(); i++) {
-                BasicDataSource dataSource0 = new BasicDataSource();
-                dataSource0.setDriverClassName(com.mysql.jdbc.Driver.class.getName());
-                dataSource0.setUrl(nodes.get(i).getUrl() + i);
-                dataSource0.setUsername(nodes.get(i).getUsername());
-                dataSource0.setPassword(nodes.get(i).getPassword());
-                result.put(SHARDING_DS_PREFIX + i, dataSource);
-            }
-            ShardingRuleConfiguration shardingRuleConfig = new ShardingRuleConfiguration();
-            shardingRuleConfig.getTableRuleConfigs().add(getOrderTableRuleConfiguration());
-            shardingRuleConfig.getTableRuleConfigs().add(getOrderItemTableRuleConfiguration());
-            shardingRuleConfig.setDefaultDatabaseShardingStrategyConfig(new InlineShardingStrategyConfiguration("user_id", "demo_ds_${user_id % 2}"));
-            dataSource = ShardingDataSourceFactory.createDataSource(result, shardingRuleConfig, new HashMap<String, Object>(), new Properties());
+            shardingNodes.forEach((key, shardingNode) -> {
+                BasicDataSource basicDataSource = new BasicDataSource();
+                basicDataSource.setDriverClassName(com.mysql.jdbc.Driver.class.getName());
+                basicDataSource.setUrl(shardingNode.getUrl());
+                basicDataSource.setUsername(shardingNode.getUsername());
+                basicDataSource.setPassword(shardingNode.getPassword());
+                shardingDataSource.put(key, basicDataSource);
+            });
+            dataSource = ShardingDataSourceFactory.createDataSource(shardingDataSource, shardingRuleConfig, new HashMap<String, Object>(), new Properties());
         } catch (Exception e) {
             throw new ShardingjdbcClientException(e.getMessage(), e);
         }
     }
-
+    
     @Override
     public void shutdown() {
         try {
