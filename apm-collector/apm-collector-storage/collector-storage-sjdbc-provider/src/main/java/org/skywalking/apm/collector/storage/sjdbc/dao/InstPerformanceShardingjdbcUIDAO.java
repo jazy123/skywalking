@@ -18,6 +18,7 @@
 
 package org.skywalking.apm.collector.storage.sjdbc.dao;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -65,7 +66,10 @@ public class InstPerformanceShardingjdbcUIDAO extends ShardingjdbcDAO implements
             params[i + 1] = timeBuckets[i];
         }
         params[0] = instanceId;
-        try (ResultSet rs = client.executeQuery(sql, params)) {
+        try (
+                ResultSet rs = client.executeQuery(sql, params);
+                Connection conn = rs.getStatement().getConnection();
+            ) {
             if (rs.next()) {
                 int callTimes = rs.getInt(InstPerformanceTable.COLUMN_CALLS);
                 int costTotal = rs.getInt(InstPerformanceTable.COLUMN_COST_TOTAL);
@@ -82,7 +86,10 @@ public class InstPerformanceShardingjdbcUIDAO extends ShardingjdbcDAO implements
         ShardingjdbcClient client = getClient();
         String sql = SqlBuilder.buildSql(GET_TPS_METRIC_SQL, InstPerformanceTable.TABLE, InstPerformanceTable.COLUMN_ID);
         Object[] params = new Object[] {instanceId};
-        try (ResultSet rs = client.executeQuery(sql, params)) {
+        try (
+                ResultSet rs = client.executeQuery(sql, params);
+                Connection conn = rs.getStatement().getConnection();
+            ) {
             if (rs.next()) {
                 return rs.getInt(InstPerformanceTable.COLUMN_CALLS);
             }
@@ -108,7 +115,10 @@ public class InstPerformanceShardingjdbcUIDAO extends ShardingjdbcDAO implements
 
         JsonArray metrics = new JsonArray();
         idList.forEach(id -> {
-            try (ResultSet rs = client.executeQuery(sql, new Object[] {id})) {
+            try (
+                    ResultSet rs = client.executeQuery(sql, new Object[] {id});
+                    Connection conn = rs.getStatement().getConnection();
+                ) {
                 if (rs.next()) {
                     int calls = rs.getInt(InstPerformanceTable.COLUMN_CALLS);
                     metrics.add(calls);
@@ -126,7 +136,10 @@ public class InstPerformanceShardingjdbcUIDAO extends ShardingjdbcDAO implements
         ShardingjdbcClient client = getClient();
         String sql = SqlBuilder.buildSql(GET_TPS_METRIC_SQL, InstPerformanceTable.TABLE, InstPerformanceTable.COLUMN_ID);
         Object[] params = new Object[] {instanceId};
-        try (ResultSet rs = client.executeQuery(sql, params)) {
+        try (
+                ResultSet rs = client.executeQuery(sql, params);
+                Connection conn = rs.getStatement().getConnection();
+            ) {
             if (rs.next()) {
                 int callTimes = rs.getInt(InstPerformanceTable.COLUMN_CALLS);
                 int costTotal = rs.getInt(InstPerformanceTable.COLUMN_COST_TOTAL);
@@ -153,7 +166,10 @@ public class InstPerformanceShardingjdbcUIDAO extends ShardingjdbcDAO implements
 
         JsonArray metrics = new JsonArray();
         idList.forEach(id -> {
-            try (ResultSet rs = client.executeQuery(sql, new Object[] {id})) {
+            try (
+                    ResultSet rs = client.executeQuery(sql, new Object[] {id});
+                    Connection conn = rs.getStatement().getConnection();
+                ) {
                 if (rs.next()) {
                     int callTimes = rs.getInt(InstPerformanceTable.COLUMN_CALLS);
                     int costTotal = rs.getInt(InstPerformanceTable.COLUMN_COST_TOTAL);

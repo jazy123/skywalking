@@ -18,6 +18,7 @@
 
 package org.skywalking.apm.collector.storage.sjdbc.dao;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -49,7 +50,10 @@ public class InstanceShardingjdbcCacheDAO extends ShardingjdbcDAO implements IIn
         ShardingjdbcClient client = getClient();
         String sql = SqlBuilder.buildSql(GET_APPLICATION_ID_SQL, InstanceTable.COLUMN_APPLICATION_ID, InstanceTable.TABLE, InstanceTable.COLUMN_INSTANCE_ID);
         Object[] params = new Object[] {instanceId};
-        try (ResultSet rs = client.executeQuery(sql, params)) {
+        try (
+                ResultSet rs = client.executeQuery(sql, params);
+                Connection conn = rs.getStatement().getConnection();
+            ) {
             if (rs.next()) {
                 return rs.getInt(InstanceTable.COLUMN_APPLICATION_ID);
             }
@@ -65,7 +69,10 @@ public class InstanceShardingjdbcCacheDAO extends ShardingjdbcDAO implements IIn
         String sql = SqlBuilder.buildSql(GET_INSTANCE_ID_SQL, InstanceTable.COLUMN_INSTANCE_ID, InstanceTable.TABLE, InstanceTable.COLUMN_APPLICATION_ID,
             InstanceTable.COLUMN_AGENT_UUID);
         Object[] params = new Object[] {applicationId, agentUUID};
-        try (ResultSet rs = client.executeQuery(sql, params)) {
+        try (
+                ResultSet rs = client.executeQuery(sql, params);
+                Connection conn = rs.getStatement().getConnection();
+            ) {
             if (rs.next()) {
                 return rs.getInt(InstanceTable.COLUMN_INSTANCE_ID);
             }

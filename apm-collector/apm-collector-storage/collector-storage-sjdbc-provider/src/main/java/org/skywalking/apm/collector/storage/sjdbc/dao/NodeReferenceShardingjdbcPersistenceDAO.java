@@ -18,6 +18,7 @@
 
 package org.skywalking.apm.collector.storage.sjdbc.dao;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -52,7 +53,10 @@ public class NodeReferenceShardingjdbcPersistenceDAO extends ShardingjdbcDAO imp
         ShardingjdbcClient client = getClient();
         String sql = SqlBuilder.buildSql(GET_SQL, NodeReferenceTable.TABLE, NodeReferenceTable.COLUMN_ID);
         Object[] params = new Object[] {id};
-        try (ResultSet rs = client.executeQuery(sql, params)) {
+        try (
+                ResultSet rs = client.executeQuery(sql, params);
+                Connection conn = rs.getStatement().getConnection();
+            ) {
             if (rs.next()) {
                 NodeReference nodeReference = new NodeReference(id);
                 nodeReference.setFrontApplicationId(rs.getInt(NodeReferenceTable.COLUMN_FRONT_APPLICATION_ID));

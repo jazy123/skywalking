@@ -18,6 +18,7 @@
 
 package org.skywalking.apm.collector.storage.sjdbc.dao;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -52,7 +53,10 @@ public class NodeMappingShardingjdbcUIDAO extends ShardingjdbcDAO implements INo
             NodeMappingTable.COLUMN_ADDRESS_ID, NodeMappingTable.TABLE, NodeMappingTable.COLUMN_TIME_BUCKET);
 
         Object[] params = new Object[] {startTime, endTime};
-        try (ResultSet rs = client.executeQuery(sql, params)) {
+        try (
+                ResultSet rs = client.executeQuery(sql, params);
+                Connection conn = rs.getStatement().getConnection();
+            ) {
             while (rs.next()) {
                 int applicationId = rs.getInt(NodeMappingTable.COLUMN_APPLICATION_ID);
                 int addressId = rs.getInt(NodeMappingTable.COLUMN_ADDRESS_ID);

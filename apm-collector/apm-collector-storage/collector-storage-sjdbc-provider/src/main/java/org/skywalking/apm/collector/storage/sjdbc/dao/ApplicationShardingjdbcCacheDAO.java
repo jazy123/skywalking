@@ -18,6 +18,7 @@
 
 package org.skywalking.apm.collector.storage.sjdbc.dao;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -50,7 +51,10 @@ public class ApplicationShardingjdbcCacheDAO extends ShardingjdbcDAO implements 
         String sql = SqlBuilder.buildSql(GET_APPLICATION_ID_OR_CODE_SQL, ApplicationTable.COLUMN_APPLICATION_ID, ApplicationTable.TABLE, ApplicationTable.COLUMN_APPLICATION_CODE);
 
         Object[] params = new Object[] {applicationCode};
-        try (ResultSet rs = client.executeQuery(sql, params)) {
+        try (
+                ResultSet rs = client.executeQuery(sql, params);
+                Connection conn = rs.getStatement().getConnection();
+            ) {
             if (rs.next()) {
                 return rs.getInt(1);
             }
@@ -65,7 +69,10 @@ public class ApplicationShardingjdbcCacheDAO extends ShardingjdbcDAO implements 
         ShardingjdbcClient client = getClient();
         String sql = SqlBuilder.buildSql(GET_APPLICATION_ID_OR_CODE_SQL, ApplicationTable.COLUMN_APPLICATION_CODE, ApplicationTable.TABLE, ApplicationTable.COLUMN_APPLICATION_ID);
         Object[] params = new Object[] {applicationId};
-        try (ResultSet rs = client.executeQuery(sql, params)) {
+        try (
+                ResultSet rs = client.executeQuery(sql, params);
+                Connection conn = rs.getStatement().getConnection();
+            ) {
             if (rs.next()) {
                 return rs.getString(1);
             }

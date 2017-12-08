@@ -45,11 +45,11 @@ public class ShardingjdbcClient implements Client {
     private final Logger logger = LoggerFactory.getLogger(ShardingjdbcClient.class);
 
     private Map<String, ShardingNode> shardingNodes;
-    
+
     private ShardingRuleConfiguration shardingRuleConfig;
-    
+
     private Map<String, DataSource> shardingDataSource = new HashMap<String, DataSource>();
-    
+
     private DataSource dataSource;
 
     public ShardingjdbcClient(Map<String, ShardingNode> shardingNodes, ShardingRuleConfiguration shardingRuleConfig) {
@@ -68,12 +68,13 @@ public class ShardingjdbcClient implements Client {
                 basicDataSource.setPassword(shardingNode.getPassword());
                 shardingDataSource.put(key, basicDataSource);
             });
-            dataSource = ShardingDataSourceFactory.createDataSource(shardingDataSource, shardingRuleConfig, new HashMap<String, Object>(), new Properties());
+            dataSource = ShardingDataSourceFactory.createDataSource(shardingDataSource, shardingRuleConfig,
+                    new HashMap<String, Object>(), new Properties());
         } catch (Exception e) {
             throw new ShardingjdbcClientException(e.getMessage(), e);
         }
     }
-    
+
     @Override
     public void shutdown() {
         try {
@@ -92,11 +93,25 @@ public class ShardingjdbcClient implements Client {
     }
 
     public void execute(String sql) throws ShardingjdbcClientException {
-        try (Statement statement = getConnection().createStatement()) {
+        Connection conn = null;
+        Statement statement = null;
+        try {
+            conn = getConnection();
+            statement = conn.createStatement();
             statement.execute(sql);
-            statement.closeOnCompletion();
         } catch (SQLException e) {
             throw new ShardingjdbcClientException(e.getMessage(), e);
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                throw new ShardingjdbcClientException(e.getMessage(), e);
+            }
         }
     }
 
@@ -122,18 +137,31 @@ public class ShardingjdbcClient implements Client {
     public boolean execute(String sql, Object[] params) throws ShardingjdbcClientException {
         logger.debug("execute insert/update/delete: {}", sql);
         boolean flag;
-        Connection conn = getConnection();
-        try (PreparedStatement statement = conn.prepareStatement(sql)) {
+        Connection conn = null;
+        PreparedStatement statement = null;
+        try {
+            conn = getConnection();
             conn.setAutoCommit(true);
+            statement = conn.prepareStatement(sql);
             if (params != null) {
                 for (int i = 0; i < params.length; i++) {
                     statement.setObject(i + 1, params[i]);
                 }
             }
             flag = statement.execute();
-            statement.closeOnCompletion();
         } catch (SQLException e) {
             throw new ShardingjdbcClientException(e.getMessage(), e);
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                throw new ShardingjdbcClientException(e.getMessage(), e);
+            }
         }
         return flag;
     }

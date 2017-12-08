@@ -18,6 +18,7 @@
 
 package org.skywalking.apm.collector.storage.sjdbc.dao;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -52,7 +53,10 @@ public class GlobalTraceShardingjdbcUIDAO extends ShardingjdbcDAO implements IGl
         String sql = SqlBuilder.buildSql(GET_GLOBAL_TRACE_ID_SQL, GlobalTraceTable.COLUMN_GLOBAL_TRACE_ID,
             GlobalTraceTable.TABLE, GlobalTraceTable.COLUMN_SEGMENT_ID);
         Object[] params = new Object[] {segmentId};
-        try (ResultSet rs = client.executeQuery(sql, params)) {
+        try (
+                ResultSet rs = client.executeQuery(sql, params);
+                Connection conn = rs.getStatement().getConnection();
+            ) {
             while (rs.next()) {
                 String globalTraceId = rs.getString(GlobalTraceTable.COLUMN_GLOBAL_TRACE_ID);
                 logger.debug("segmentId: {}, global trace id: {}", segmentId, globalTraceId);
@@ -70,7 +74,10 @@ public class GlobalTraceShardingjdbcUIDAO extends ShardingjdbcDAO implements IGl
         String sql = SqlBuilder.buildSql(GET_SEGMENT_IDS_SQL, GlobalTraceTable.COLUMN_SEGMENT_ID,
             GlobalTraceTable.TABLE, GlobalTraceTable.COLUMN_GLOBAL_TRACE_ID);
         Object[] params = new Object[] {globalTraceId};
-        try (ResultSet rs = client.executeQuery(sql, params)) {
+        try (
+                ResultSet rs = client.executeQuery(sql, params);
+                Connection conn = rs.getStatement().getConnection();
+            ) {
             while (rs.next()) {
                 String segmentId = rs.getString(GlobalTraceTable.COLUMN_SEGMENT_ID);
                 logger.debug("segmentId: {}, global trace id: {}", segmentId, globalTraceId);

@@ -18,6 +18,7 @@
 
 package org.skywalking.apm.collector.storage.sjdbc.dao;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -79,7 +80,10 @@ public class ServiceEntryShardingjdbcUIDAO extends ShardingjdbcDAO implements IS
         JsonArray serviceArray = new JsonArray();
         JsonObject response = new JsonObject();
         int index = 0;
-        try (ResultSet rs = client.executeQuery(sql, p)) {
+        try (
+                ResultSet rs = client.executeQuery(sql, p);
+                Connection conn = rs.getStatement().getConnection();
+            ) {
             while (rs.next()) {
                 int appId = rs.getInt(ServiceEntryTable.COLUMN_APPLICATION_ID);
                 int entryServiceId = rs.getInt(ServiceEntryTable.COLUMN_ENTRY_SERVICE_ID);

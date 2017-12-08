@@ -47,12 +47,12 @@ public class BatchShardingjdbcDAO extends ShardingjdbcDAO implements IBatchDAO {
     public void batchPersistence(List<?> batchCollection) {
         if (batchCollection != null && batchCollection.size() > 0) {
             logger.debug("the batch collection size is {}", batchCollection.size());
-            Connection conn;
+            Connection conn = null;
             final Map<String, PreparedStatement> batchSqls = new HashMap<>();
             try {
                 conn = getClient().getConnection();
                 conn.setAutoCommit(true);
-                PreparedStatement ps;
+                PreparedStatement ps = null;
                 for (Object entity : batchCollection) {
                     ShardingjdbcSqlEntity e = getShardingjdbcSqlEntity(entity);
                     String sql = e.getSql();
@@ -78,8 +78,22 @@ public class BatchShardingjdbcDAO extends ShardingjdbcDAO implements IBatchDAO {
                 }
             } catch (SQLException | ShardingjdbcClientException e) {
                 logger.error(e.getMessage(), e);
+            } finally {
+                try {
+                    for (PreparedStatement ps : batchSqls.values()) {
+                        if (ps != null) {
+                            ps.close();
+                        }
+                    }
+                    if (conn != null) {
+                        conn.close();
+                    }
+                    batchSqls.clear();
+                } catch (SQLException e) {
+                    logger.error(e.getMessage(), e);
+                }
+                
             }
-            batchSqls.clear();
         }
     }
 

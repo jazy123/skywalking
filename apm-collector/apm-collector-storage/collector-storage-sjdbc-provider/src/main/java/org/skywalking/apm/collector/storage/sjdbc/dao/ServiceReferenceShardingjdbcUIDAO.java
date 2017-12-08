@@ -18,6 +18,7 @@
 
 package org.skywalking.apm.collector.storage.sjdbc.dao;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedHashMap;
@@ -67,7 +68,10 @@ public class ServiceReferenceShardingjdbcUIDAO extends ShardingjdbcDAO implement
     private Map<String, JsonObject> load(ShardingjdbcClient client, Object[] params, String sql) {
         Map<String, JsonObject> serviceReferenceMap = new LinkedHashMap<>();
 
-        try (ResultSet rs = client.executeQuery(sql, params)) {
+        try (
+                ResultSet rs = client.executeQuery(sql, params);
+                Connection conn = rs.getStatement().getConnection();
+            ) {
             while (rs.next()) {
                 int frontServiceId = rs.getInt(ServiceReferenceTable.COLUMN_FRONT_SERVICE_ID);
                 parseSubAggregate(serviceReferenceMap, rs, frontServiceId);

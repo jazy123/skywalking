@@ -18,6 +18,7 @@
 
 package org.skywalking.apm.collector.storage.sjdbc.dao;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -50,7 +51,10 @@ public class ServiceNameShardingjdbcCacheDAO extends ShardingjdbcDAO implements 
         String sql = SqlBuilder.buildSql(GET_SERVICE_NAME_SQL, ServiceNameTable.COLUMN_APPLICATION_ID, ServiceNameTable.COLUMN_SERVICE_NAME,
             ServiceNameTable.TABLE, ServiceNameTable.COLUMN_SERVICE_ID);
         Object[] params = new Object[] {serviceId};
-        try (ResultSet rs = client.executeQuery(sql, params)) {
+        try (
+                ResultSet rs = client.executeQuery(sql, params);
+                Connection conn = rs.getStatement().getConnection();
+            ) {
             if (rs.next()) {
                 String serviceName = rs.getString(ServiceNameTable.COLUMN_SERVICE_NAME);
                 int applicationId = rs.getInt(ServiceNameTable.COLUMN_APPLICATION_ID);
@@ -67,7 +71,10 @@ public class ServiceNameShardingjdbcCacheDAO extends ShardingjdbcDAO implements 
         String sql = SqlBuilder.buildSql(GET_SERVICE_ID_SQL, ServiceNameTable.COLUMN_SERVICE_ID,
             ServiceNameTable.TABLE, ServiceNameTable.COLUMN_APPLICATION_ID, ServiceNameTable.COLUMN_SERVICE_NAME);
         Object[] params = new Object[] {applicationId, serviceName};
-        try (ResultSet rs = client.executeQuery(sql, params)) {
+        try (
+                ResultSet rs = client.executeQuery(sql, params);
+                Connection conn = rs.getStatement().getConnection();
+            ) {
             if (rs.next()) {
                 return rs.getInt(ServiceNameTable.COLUMN_SERVICE_ID);
             }

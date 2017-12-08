@@ -18,6 +18,7 @@
 
 package org.skywalking.apm.collector.storage.sjdbc.dao;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -57,7 +58,10 @@ public class NodeReferenceShardingjdbcUIDAO extends ShardingjdbcDAO implements I
             NodeReferenceTable.COLUMN_FRONT_APPLICATION_ID, NodeReferenceTable.COLUMN_BEHIND_APPLICATION_ID);
 
         Object[] params = new Object[] {startTime, endTime};
-        try (ResultSet rs = client.executeQuery(sql, params)) {
+        try (
+                ResultSet rs = client.executeQuery(sql, params);
+                Connection conn = rs.getStatement().getConnection();
+            ) {
             while (rs.next()) {
                 int frontApplicationId = rs.getInt(NodeReferenceTable.COLUMN_FRONT_APPLICATION_ID);
                 int behindApplicationId = rs.getInt(NodeReferenceTable.COLUMN_BEHIND_APPLICATION_ID);

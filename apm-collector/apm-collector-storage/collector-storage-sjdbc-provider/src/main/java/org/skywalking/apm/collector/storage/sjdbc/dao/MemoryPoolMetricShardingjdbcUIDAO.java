@@ -18,6 +18,7 @@
 
 package org.skywalking.apm.collector.storage.sjdbc.dao;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -55,7 +56,10 @@ public class MemoryPoolMetricShardingjdbcUIDAO extends ShardingjdbcDAO implement
         String sql = SqlBuilder.buildSql(GET_MEMORY_POOL_METRIC_SQL, MemoryPoolMetricTable.TABLE, MemoryPoolMetricTable.COLUMN_ID);
         Object[] params = new Object[] {id};
         JsonObject metric = new JsonObject();
-        try (ResultSet rs = client.executeQuery(sql, params)) {
+        try (
+                ResultSet rs = client.executeQuery(sql, params);
+                Connection conn = rs.getStatement().getConnection();
+            ) {
             if (rs.next()) {
                 metric.addProperty("max", rs.getInt(MemoryPoolMetricTable.COLUMN_MAX));
                 metric.addProperty("init", rs.getInt(MemoryPoolMetricTable.COLUMN_INIT));
@@ -87,7 +91,10 @@ public class MemoryPoolMetricShardingjdbcUIDAO extends ShardingjdbcDAO implement
         JsonArray usedMetric = new JsonArray();
 
         idList.forEach(id -> {
-            try (ResultSet rs = client.executeQuery(sql, new String[] {id})) {
+            try (
+                    ResultSet rs = client.executeQuery(sql, new String[] {id});
+                    Connection conn = rs.getStatement().getConnection();
+                ) {
                 if (rs.next()) {
                     metric.addProperty("max", rs.getLong(MemoryPoolMetricTable.COLUMN_MAX));
                     metric.addProperty("init", rs.getLong(MemoryPoolMetricTable.COLUMN_INIT));

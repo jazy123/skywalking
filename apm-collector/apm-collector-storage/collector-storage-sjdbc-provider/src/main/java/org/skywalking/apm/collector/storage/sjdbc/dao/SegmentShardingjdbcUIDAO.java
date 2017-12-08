@@ -18,6 +18,7 @@
 
 package org.skywalking.apm.collector.storage.sjdbc.dao;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -49,7 +50,10 @@ public class SegmentShardingjdbcUIDAO extends ShardingjdbcDAO implements ISegmen
         String sql = SqlBuilder.buildSql(GET_SEGMENT_SQL, SegmentTable.COLUMN_DATA_BINARY,
             SegmentTable.TABLE, SegmentTable.COLUMN_ID);
         Object[] params = new Object[] {segmentId};
-        try (ResultSet rs = client.executeQuery(sql, params)) {
+        try (
+                ResultSet rs = client.executeQuery(sql, params);
+                Connection conn = rs.getStatement().getConnection();
+            ) {
             if (rs.next()) {
                 byte[] dataBinary = rs.getBytes(SegmentTable.COLUMN_DATA_BINARY);
                 try {

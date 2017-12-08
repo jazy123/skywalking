@@ -18,6 +18,7 @@
 
 package org.skywalking.apm.collector.storage.sjdbc.dao;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -58,7 +59,10 @@ public class NodeComponentShardingjdbcUIDAO extends ShardingjdbcDAO implements I
         String sql = SqlBuilder.buildSql(AGGREGATE_COMPONENT_SQL, NodeComponentTable.COLUMN_COMPONENT_ID, NodeComponentTable.COLUMN_PEER_ID,
             NodeComponentTable.TABLE, NodeComponentTable.COLUMN_TIME_BUCKET);
         Object[] params = new Object[] {startTime, endTime};
-        try (ResultSet rs = client.executeQuery(sql, params)) {
+        try (
+                ResultSet rs = client.executeQuery(sql, params);
+                Connection conn = rs.getStatement().getConnection();
+            ) {
             while (rs.next()) {
                 int peerId = rs.getInt(NodeComponentTable.COLUMN_PEER_ID);
                 int componentId = rs.getInt(NodeComponentTable.COLUMN_COMPONENT_ID);
