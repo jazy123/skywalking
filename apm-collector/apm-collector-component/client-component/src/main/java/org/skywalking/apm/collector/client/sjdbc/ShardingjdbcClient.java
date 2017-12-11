@@ -123,7 +123,6 @@ public class ShardingjdbcClient implements Client {
                 }
             }
             rs = statement.executeQuery();
-            statement.closeOnCompletion();
         } catch (SQLException e) {
             throw new ShardingjdbcClientException(e.getMessage(), e);
         }
