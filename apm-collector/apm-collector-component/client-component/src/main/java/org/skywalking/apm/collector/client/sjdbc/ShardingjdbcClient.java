@@ -77,11 +77,7 @@ public class ShardingjdbcClient implements Client {
 
     @Override
     public void shutdown() {
-        try {
-            dataSource.getConnection().close();
-        } catch (SQLException e) {
-            logger.error(e.getMessage(), e);
-        }
+        
     }
 
     public Connection getConnection() throws ShardingjdbcClientException {

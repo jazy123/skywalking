@@ -18,9 +18,6 @@
 
 package org.skywalking.apm.collector.storage.sjdbc.base.define;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 
 import org.skywalking.apm.collector.client.Client;
@@ -50,37 +47,14 @@ public class ShardingjdbcStorageInstaller extends StorageInstaller {
     }
 
     @Override protected boolean isExists(Client client, TableDefine tableDefine) throws StorageException {
-        ShardingjdbcClient shardingjdbcClient = (ShardingjdbcClient)client;
-        Connection conn = null;
-        ResultSet rs = null;
-        try {
-            logger.info("check if table {} exist ", tableDefine.getName());
-            conn = shardingjdbcClient.getConnection();
-            rs = conn.getMetaData().getTables(null, null, tableDefine.getName().toUpperCase(), null);
-            if (rs.next()) {
-                return true;
-            }
-        } catch (SQLException | ShardingjdbcClientException e) {
-            throw new StorageInstallException(e.getMessage(), e);
-        } finally {
-            try {
-                if (rs != null) {
-                    rs.close();
-                }
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (SQLException e) {
-                throw new StorageInstallException(e.getMessage(), e);
-            }
-        }
+        logger.info("check if table {} exist ", tableDefine.getName());
         return false;
     }
 
     @Override protected boolean deleteTable(Client client, TableDefine tableDefine) throws StorageException {
         ShardingjdbcClient shardingjdbcClient = (ShardingjdbcClient)client;
         try {
-            shardingjdbcClient.execute("drop table if exists " + tableDefine.getName());
+            shardingjdbcClient.execute("DROP TABLE IF EXISTS " + tableDefine.getName());
             return true;
         } catch (ShardingjdbcClientException e) {
             throw new StorageInstallException(e.getMessage(), e);
@@ -92,7 +66,7 @@ public class ShardingjdbcStorageInstaller extends StorageInstaller {
         ShardingjdbcTableDefine shardingjdbcTableDefine = (ShardingjdbcTableDefine)tableDefine;
 
         StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("CREATE TABLE ").append(shardingjdbcTableDefine.getName()).append(" (");
+        sqlBuilder.append("CREATE TABLE IF NOT EXISTS ").append(shardingjdbcTableDefine.getName()).append(" (");
 
         shardingjdbcTableDefine.getColumnDefines().forEach(columnDefine -> {
             ShardingjdbcColumnDefine shardingjdbcColumnDefine = (ShardingjdbcColumnDefine)columnDefine;
@@ -106,7 +80,7 @@ public class ShardingjdbcStorageInstaller extends StorageInstaller {
         sqlBuilder.delete(sqlBuilder.length() - 1, sqlBuilder.length());
         sqlBuilder.append(")");
         try {
-            logger.info("create shardingjdbc table with sql {}", sqlBuilder);
+            logger.info("create if not exists shardingjdbc table with sql {}", sqlBuilder);
             shardingjdbcClient.execute(sqlBuilder.toString());
         } catch (ShardingjdbcClientException e) {
             throw new StorageInstallException(e.getMessage(), e);
