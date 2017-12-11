@@ -21,6 +21,7 @@ package org.skywalking.apm.collector.storage.sjdbc.dao;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,7 +56,8 @@ public class CpuMetricShardingjdbcUIDAO extends ShardingjdbcDAO implements ICpuM
         Object[] params = new Object[] {id};
         try (
                 ResultSet rs = client.executeQuery(sql, params);
-                Connection conn = rs.getStatement().getConnection();
+                Statement st = rs.getStatement();
+                Connection conn = st.getConnection();
             ) {
             if (rs.next()) {
                 return rs.getInt(CpuMetricTable.COLUMN_USAGE_PERCENT);
@@ -83,7 +85,8 @@ public class CpuMetricShardingjdbcUIDAO extends ShardingjdbcDAO implements ICpuM
         idList.forEach(id -> {
             try (
                     ResultSet rs = client.executeQuery(sql, new String[] {id});
-                    Connection conn = rs.getStatement().getConnection();
+                    Statement st = rs.getStatement();
+                    Connection conn = st.getConnection();
                 ) {
                 if (rs.next()) {
                     double cpuUsed = rs.getDouble(CpuMetricTable.COLUMN_USAGE_PERCENT);

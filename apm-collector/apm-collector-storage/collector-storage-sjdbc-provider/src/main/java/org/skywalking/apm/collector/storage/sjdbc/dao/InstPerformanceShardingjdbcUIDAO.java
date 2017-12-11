@@ -21,6 +21,7 @@ package org.skywalking.apm.collector.storage.sjdbc.dao;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,7 +69,8 @@ public class InstPerformanceShardingjdbcUIDAO extends ShardingjdbcDAO implements
         params[0] = instanceId;
         try (
                 ResultSet rs = client.executeQuery(sql, params);
-                Connection conn = rs.getStatement().getConnection();
+                Statement st = rs.getStatement();
+                Connection conn = st.getConnection();
             ) {
             if (rs.next()) {
                 int callTimes = rs.getInt(InstPerformanceTable.COLUMN_CALLS);
@@ -88,7 +90,8 @@ public class InstPerformanceShardingjdbcUIDAO extends ShardingjdbcDAO implements
         Object[] params = new Object[] {instanceId};
         try (
                 ResultSet rs = client.executeQuery(sql, params);
-                Connection conn = rs.getStatement().getConnection();
+                Statement st = rs.getStatement();
+                Connection conn = st.getConnection();
             ) {
             if (rs.next()) {
                 return rs.getInt(InstPerformanceTable.COLUMN_CALLS);
@@ -117,7 +120,8 @@ public class InstPerformanceShardingjdbcUIDAO extends ShardingjdbcDAO implements
         idList.forEach(id -> {
             try (
                     ResultSet rs = client.executeQuery(sql, new Object[] {id});
-                    Connection conn = rs.getStatement().getConnection();
+                    Statement st = rs.getStatement();
+                    Connection conn = st.getConnection();
                 ) {
                 if (rs.next()) {
                     int calls = rs.getInt(InstPerformanceTable.COLUMN_CALLS);
@@ -138,7 +142,8 @@ public class InstPerformanceShardingjdbcUIDAO extends ShardingjdbcDAO implements
         Object[] params = new Object[] {instanceId};
         try (
                 ResultSet rs = client.executeQuery(sql, params);
-                Connection conn = rs.getStatement().getConnection();
+                Statement st = rs.getStatement();
+                Connection conn = st.getConnection();
             ) {
             if (rs.next()) {
                 int callTimes = rs.getInt(InstPerformanceTable.COLUMN_CALLS);
@@ -168,7 +173,8 @@ public class InstPerformanceShardingjdbcUIDAO extends ShardingjdbcDAO implements
         idList.forEach(id -> {
             try (
                     ResultSet rs = client.executeQuery(sql, new Object[] {id});
-                    Connection conn = rs.getStatement().getConnection();
+                    Statement st = rs.getStatement();
+                    Connection conn = st.getConnection();
                 ) {
                 if (rs.next()) {
                     int callTimes = rs.getInt(InstPerformanceTable.COLUMN_CALLS);

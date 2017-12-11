@@ -21,6 +21,7 @@ package org.skywalking.apm.collector.storage.sjdbc.dao;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,7 +74,8 @@ public class GCMetricShardingjdbcUIDAO extends ShardingjdbcDAO implements IGCMet
         params[0] = instanceId;
         try (
                 ResultSet rs = client.executeQuery(sql, params);
-                Connection conn = rs.getStatement().getConnection();
+                Statement st = rs.getStatement();
+                Connection conn = st.getConnection();
             ) {
             if (rs.next()) {
                 int phrase = rs.getInt(GCMetricTable.COLUMN_PHRASE);
@@ -99,7 +101,8 @@ public class GCMetricShardingjdbcUIDAO extends ShardingjdbcDAO implements IGCMet
         Object[] params = new Object[] {youngId};
         try (
                 ResultSet rs = client.executeQuery(sql, params);
-                Connection conn = rs.getStatement().getConnection();
+                Statement st = rs.getStatement();
+                Connection conn = st.getConnection();
             ) {
             if (rs.next()) {
                 response.addProperty("ygc", rs.getInt(GCMetricTable.COLUMN_COUNT));
@@ -111,7 +114,8 @@ public class GCMetricShardingjdbcUIDAO extends ShardingjdbcDAO implements IGCMet
         Object[] params1 = new Object[] {oldId};
         try (
                 ResultSet rs = client.executeQuery(sql, params1);
-                Connection conn = rs.getStatement().getConnection();
+                Statement st = rs.getStatement();
+                Connection conn = st.getConnection();
             ) {
             if (rs.next()) {
                 response.addProperty("ogc", rs.getInt(GCMetricTable.COLUMN_COUNT));
@@ -160,7 +164,8 @@ public class GCMetricShardingjdbcUIDAO extends ShardingjdbcDAO implements IGCMet
         idsList.forEach(id -> {
             try (
                     ResultSet rs = client.executeQuery(sql, new String[] {id});
-                    Connection conn = rs.getStatement().getConnection();
+                    Statement st = rs.getStatement();
+                    Connection conn = st.getConnection();
                 ) {
                 if (rs.next()) {
                     metricArray.add(rs.getInt(GCMetricTable.COLUMN_COUNT));

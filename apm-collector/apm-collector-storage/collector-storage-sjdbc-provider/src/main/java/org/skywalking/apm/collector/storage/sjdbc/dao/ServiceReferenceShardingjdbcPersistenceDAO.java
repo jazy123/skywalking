@@ -21,6 +21,7 @@ package org.skywalking.apm.collector.storage.sjdbc.dao;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -56,7 +57,8 @@ public class ServiceReferenceShardingjdbcPersistenceDAO extends ShardingjdbcDAO 
         Object[] params = new Object[] {id};
         try (
                 ResultSet rs = client.executeQuery(sql, params);
-                Connection conn = rs.getStatement().getConnection();
+                Statement st = rs.getStatement();
+                Connection conn = st.getConnection();
             ) {
             if (rs.next()) {
                 ServiceReference serviceReference = new ServiceReference(id);

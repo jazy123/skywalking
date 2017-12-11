@@ -21,6 +21,7 @@ package org.skywalking.apm.collector.storage.sjdbc.dao;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -133,7 +134,8 @@ public class SegmentCostShardingjdbcUIDAO extends ShardingjdbcDAO implements ISe
         int num = from;
         try (
                 ResultSet rs = client.executeQuery(sql, p);
-                Connection conn = rs.getStatement().getConnection();
+                Statement st = rs.getStatement();
+                Connection conn = st.getConnection();
             ) {
             while (rs.next()) {
                 JsonObject topSegmentJson = new JsonObject();

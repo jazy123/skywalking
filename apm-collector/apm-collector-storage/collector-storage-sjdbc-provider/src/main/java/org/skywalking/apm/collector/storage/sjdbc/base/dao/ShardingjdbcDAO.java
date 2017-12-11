@@ -21,6 +21,7 @@ package org.skywalking.apm.collector.storage.sjdbc.base.dao;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import org.skywalking.apm.collector.client.sjdbc.ShardingjdbcClient;
 import org.skywalking.apm.collector.client.sjdbc.ShardingjdbcClientException;
@@ -53,7 +54,8 @@ public abstract class ShardingjdbcDAO extends AbstractDAO<ShardingjdbcClient> {
         ShardingjdbcClient client = getClient();
         try (
                 ResultSet rs = client.executeQuery(sql, null);
-                Connection conn = rs.getStatement().getConnection();
+                Statement st = rs.getStatement();
+                Connection conn = st.getConnection();
             ) {
             if (rs.next()) {
                 int id = rs.getInt(1);

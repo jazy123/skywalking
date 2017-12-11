@@ -21,6 +21,7 @@ package org.skywalking.apm.collector.storage.sjdbc.dao;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -64,7 +65,8 @@ public class InstanceShardingjdbcUIDAO extends ShardingjdbcDAO implements IInsta
         Object[] params = new Object[] {fiveMinuteBefore};
         try (
                 ResultSet rs = client.executeQuery(sql, params);
-                Connection conn = rs.getStatement().getConnection();
+                Statement st = rs.getStatement();
+                Connection conn = st.getConnection();
             ) {
             if (rs.next()) {
                 return rs.getLong(1);
@@ -85,7 +87,8 @@ public class InstanceShardingjdbcUIDAO extends ShardingjdbcDAO implements IInsta
         Object[] params = new Object[] {fiveMinuteBefore, applicationInstanceId};
         try (
                 ResultSet rs = client.executeQuery(sql, params);
-                Connection conn = rs.getStatement().getConnection();
+                Statement st = rs.getStatement();
+                Connection conn = st.getConnection();
             ) {
             if (rs.next()) {
                 return rs.getLong(1);
@@ -105,7 +108,8 @@ public class InstanceShardingjdbcUIDAO extends ShardingjdbcDAO implements IInsta
         Object[] params = new Object[] {startTime};
         try (
                 ResultSet rs = client.executeQuery(sql, params);
-                Connection conn = rs.getStatement().getConnection();
+                Statement st = rs.getStatement();
+                Connection conn = st.getConnection();
             ) {
             while (rs.next()) {
                 Integer applicationId = rs.getInt(InstanceTable.COLUMN_APPLICATION_ID);
@@ -128,7 +132,8 @@ public class InstanceShardingjdbcUIDAO extends ShardingjdbcDAO implements IInsta
         Object[] params = new Object[] {instanceId};
         try (
                 ResultSet rs = client.executeQuery(sql, params);
-                Connection conn = rs.getStatement().getConnection();
+                Statement st = rs.getStatement();
+                Connection conn = st.getConnection();
             ) {
             if (rs.next()) {
                 Instance instance = new Instance(rs.getString(InstanceTable.COLUMN_ID));
@@ -154,7 +159,8 @@ public class InstanceShardingjdbcUIDAO extends ShardingjdbcDAO implements IInsta
         Object[] params = new Object[] {applicationId, timeBucket};
         try (
                 ResultSet rs = client.executeQuery(sql, params);
-                Connection conn = rs.getStatement().getConnection();
+                Statement st = rs.getStatement();
+                Connection conn = st.getConnection();
             ) {
             while (rs.next()) {
                 Instance instance = new Instance(rs.getString(InstanceTable.COLUMN_ID));

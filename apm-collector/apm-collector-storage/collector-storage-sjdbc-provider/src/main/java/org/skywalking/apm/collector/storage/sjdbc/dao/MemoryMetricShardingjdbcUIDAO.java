@@ -21,6 +21,7 @@ package org.skywalking.apm.collector.storage.sjdbc.dao;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,7 +59,8 @@ public class MemoryMetricShardingjdbcUIDAO extends ShardingjdbcDAO implements IM
         JsonObject metric = new JsonObject();
         try (
                 ResultSet rs = client.executeQuery(sql, params);
-                Connection conn = rs.getStatement().getConnection();
+                Statement st = rs.getStatement();
+                Connection conn = st.getConnection();
             ) {
             if (rs.next()) {
                 metric.addProperty("max", rs.getInt(MemoryMetricTable.COLUMN_MAX));
@@ -93,7 +95,8 @@ public class MemoryMetricShardingjdbcUIDAO extends ShardingjdbcDAO implements IM
         idList.forEach(id -> {
             try (
                     ResultSet rs = client.executeQuery(sql, new String[] {id});
-                    Connection conn = rs.getStatement().getConnection();
+                    Statement st = rs.getStatement();
+                    Connection conn = st.getConnection();
                 ) {
                 if (rs.next()) {
                     metric.addProperty("max", rs.getLong(MemoryMetricTable.COLUMN_MAX));

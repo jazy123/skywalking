@@ -21,6 +21,7 @@ package org.skywalking.apm.collector.storage.sjdbc.dao;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import org.skywalking.apm.collector.client.sjdbc.ShardingjdbcClient;
 import org.skywalking.apm.collector.client.sjdbc.ShardingjdbcClientException;
@@ -52,7 +53,8 @@ public class InstanceShardingjdbcCacheDAO extends ShardingjdbcDAO implements IIn
         Object[] params = new Object[] {instanceId};
         try (
                 ResultSet rs = client.executeQuery(sql, params);
-                Connection conn = rs.getStatement().getConnection();
+                Statement st = rs.getStatement();
+                Connection conn = st.getConnection();
             ) {
             if (rs.next()) {
                 return rs.getInt(InstanceTable.COLUMN_APPLICATION_ID);
@@ -71,7 +73,8 @@ public class InstanceShardingjdbcCacheDAO extends ShardingjdbcDAO implements IIn
         Object[] params = new Object[] {applicationId, agentUUID};
         try (
                 ResultSet rs = client.executeQuery(sql, params);
-                Connection conn = rs.getStatement().getConnection();
+                Statement st = rs.getStatement();
+                Connection conn = st.getConnection();
             ) {
             if (rs.next()) {
                 return rs.getInt(InstanceTable.COLUMN_INSTANCE_ID);

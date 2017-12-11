@@ -21,6 +21,7 @@ package org.skywalking.apm.collector.storage.sjdbc.dao;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,7 +56,8 @@ public class GlobalTraceShardingjdbcUIDAO extends ShardingjdbcDAO implements IGl
         Object[] params = new Object[] {segmentId};
         try (
                 ResultSet rs = client.executeQuery(sql, params);
-                Connection conn = rs.getStatement().getConnection();
+                Statement st = rs.getStatement();
+                Connection conn = st.getConnection();
             ) {
             while (rs.next()) {
                 String globalTraceId = rs.getString(GlobalTraceTable.COLUMN_GLOBAL_TRACE_ID);
@@ -76,7 +78,8 @@ public class GlobalTraceShardingjdbcUIDAO extends ShardingjdbcDAO implements IGl
         Object[] params = new Object[] {globalTraceId};
         try (
                 ResultSet rs = client.executeQuery(sql, params);
-                Connection conn = rs.getStatement().getConnection();
+                Statement st = rs.getStatement();
+                Connection conn = st.getConnection();
             ) {
             while (rs.next()) {
                 String segmentId = rs.getString(GlobalTraceTable.COLUMN_SEGMENT_ID);
